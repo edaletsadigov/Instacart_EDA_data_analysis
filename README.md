@@ -1,5 +1,3 @@
-# Instacart_EDA_data_analysis
-
 # Instacart Orders — Exploratory Data Analysis
 
 Exploratory data analysis of the Instacart online grocery ordering dataset, covering data cleaning, missing-value handling, and customer/product behavior analysis across ~4.5M order-product records and ~479K orders.
@@ -25,7 +23,7 @@ Five CSV files (semicolon-delimited), representing a relational e-commerce schem
 | `aisles` | 134 × 2 | Aisle ID → name lookup |
 | `order_products` | 4,545,007 × 4 | One row per product per order: cart position, reorder flag |
 
-> Note: raw CSVs are not included in this repository (local file paths only). To reproduce, place the five files in a `data/` folder and update the paths in the notebook.
+Raw CSVs live in [`data/`](data/), along with a full data dictionary and entity-relationship notes in [`data/README.md`](data/README.md).
 
 ## Data Cleaning
 
@@ -61,19 +59,31 @@ Five CSV files (semicolon-delimited), representing a relational e-commerce schem
 ### Ordering time patterns
 - Orders peak between **10 AM and 4 PM**, with the sharpest single hour at 10 AM (40,578 orders). Activity is minimal overnight (as low as 765 orders at 4 AM).
 - **Saturday (62,649 orders)** and **Sunday (day 0, 84,090 orders)** — the two highest-volume days — outpace **midweek (days 3–4, ~60K orders)**.
+
+![Order count by hour of day](charts/01_orders_by_hour.png)
+![Order count by day of week](charts/02_orders_by_day_of_week.png)
+
 - Wednesday vs. Saturday hourly comparison: both days peak in the same 10 AM–4 PM window, but Saturday's curve is flatter (spread evenly through the day, no work schedule shaping it), while Wednesday shows a sharper 9–11 AM ramp-up consistent with a workday routine.
+
+![Wednesday vs Saturday order distribution by hour](charts/04_wednesday_vs_saturday.png)
 
 ### Reorder cadence
 - `days_since_prior_order` ranges from 0 to 30, with a distribution that has a sharp spike exactly at 30 — evidence of **top-coding** (values beyond 30 days were likely capped, not naturally tapering off).
 - Secondary spikes appear at 7, 14, 21, and 28 days, indicating a **weekly shopping rhythm** for a meaningful share of customers.
 
+![Days until the next order](charts/03_days_since_prior_order.png)
+
 ### Customer order frequency
 - 157,437 unique customers placed a combined set of orders; the median customer has placed **9 orders** (mean 15.6, right-skewed).
 - Distribution is classic long-tail: most customers order only a handful of times (1–5), while a smaller group are frequent repeat shoppers (up to 100 orders capped).
 
+![Total orders per customer](charts/05_orders_per_customer.png)
+
 ### Basket size
 - Median basket size: **8 items** per order (mean 10.1, right-skewed).
 - Most orders fall between 1 and 15 items; baskets of 30+ items are rare outliers.
+
+![Distribution of items per order](charts/07_items_per_order.png)
 
 ### Top products
 | Rank | Product | Orders |
@@ -86,14 +96,24 @@ Five CSV files (semicolon-delimited), representing a relational e-commerce schem
 
 The top-20 most-ordered list is dominated almost entirely by fresh produce.
 
+![Top 20 most frequently ordered products](charts/06_top20_ordered_products.png)
+
 ### Reorder behavior
 - The most-reordered products mirror the most-ordered products almost exactly (Banana: 55,763 reorders; Bag of Organic Bananas: 44,450) — high purchase volume and high loyalty go hand in hand for produce staples.
 - Restricting to products with ≥50 total orders (to avoid unstable ratios from 1–2 order products), the **highest reorder-proportion products** are dominated by beverages and dairy staples (e.g., DanActive Vanilla Probiotic Dairy Drink at 90.8%, Lemon Lime Seltzer at 89.4%), suggesting habitual, low-consideration repurchase categories.
 - Across all qualifying products, reorder proportion clusters mostly between **0.3 and 0.7** — roughly half of a typical product's orders are repeat purchases.
 - At the customer level, reorder proportion is widely spread (mean 49.5%, min 0%, max 100%), splitting shoppers into two loose behavioral segments: **"loyal repeaters"** (near 100%) and **"explorers"** (near 0%) who rarely rebuy the same item.
 
+![Top 20 most frequently reordered products](charts/08_top20_reordered_products.png)
+![Reorder proportion by product](charts/09_reorder_proportion_by_product.png)
+![Reorder proportion by customer](charts/10_reorder_proportion_by_customer.png)
+
 ### First item added to cart
 - **Banana** is the single most common first item added to a cart (15,562 times), an even wider lead than in the overall order-count ranking — suggesting shoppers often start their route in the produce section.
+
+![Top 20 items added to the cart first](charts/11_top20_first_added.png)
+
+All chart files, plus a one-line takeaway per chart, are indexed in [`charts/README.md`](charts/README.md).
 
 ## Business Implications
 
@@ -112,17 +132,36 @@ The top-20 most-ordered list is dominated almost entirely by fresh produce.
 
 ```
 .
+├── README.md
 ├── Sadıqov_Ədalət_project.ipynb   # Main analysis notebook
-└── README.md
+├── data/
+│   ├── README.md                  # Data dictionary & entity relationships
+│   ├── instacart_orders.csv
+│   ├── products.csv
+│   ├── departments.csv
+│   ├── aisles.csv
+│   └── order_products.csv
+└── charts/
+    ├── README.md                  # Chart index with takeaways
+    ├── 01_orders_by_hour.png
+    ├── 02_orders_by_day_of_week.png
+    ├── 03_days_since_prior_order.png
+    ├── 04_wednesday_vs_saturday.png
+    ├── 05_orders_per_customer.png
+    ├── 06_top20_ordered_products.png
+    ├── 07_items_per_order.png
+    ├── 08_top20_reordered_products.png
+    ├── 09_reorder_proportion_by_product.png
+    ├── 10_reorder_proportion_by_customer.png
+    └── 11_top20_first_added.png
 ```
 
 ## How to Run
 
 1. Clone the repository
-2. Place the five source CSVs (`instacart_orders.csv`, `products.csv`, `departments.csv`, `aisles.csv`, `order_products.csv`) in a local `data/` folder
-3. Update the file paths in the first code cell to point to your `data/` folder
-4. Install dependencies: `pip install pandas numpy plotly`
-5. Run the notebook top to bottom in Jupyter
+2. The five source CSVs are already included in [`data/`](data/) — no external download needed
+3. Install dependencies: `pip install pandas numpy plotly`
+4. Run the notebook top to bottom in Jupyter
 
 ## Author
 

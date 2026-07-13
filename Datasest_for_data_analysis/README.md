@@ -78,5 +78,4 @@ aisles ───────┘
 ## Notes
 
 - Delimiter is `;`, not `,` — use `sep=";"` when loading with pandas.
-- `order_products.csv` is ~86 MB. GitHub allows files up to 100 MB via normal `git push`, but shows a warning above 50 MB. If it ever needs to grow past 100 MB (e.g. a larger data pull), switch to [Git LFS](https://git-lfs.com) instead of committing it directly.
 - See the root [`README.md`](../README.md) for cleaning steps, missing-value handling, and analysis findings derived from these files.

@@ -134,7 +134,7 @@ All chart files, plus a one-line takeaway per chart, are indexed in [`charts/REA
 .
 ├── README.md
 ├── Sadıqov_Ədalət_project.ipynb   # Main analysis notebook
-├── data/
+├── Datasets_for_data_analysis/
 │   ├── README.md                  # Data dictionary & entity relationships
 │   ├── instacart_orders.csv
 │   ├── products.csv

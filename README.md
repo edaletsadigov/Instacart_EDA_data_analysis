@@ -165,4 +165,4 @@ All chart files, plus a one-line takeaway per chart, are indexed in [`charts/REA
 
 ## Author
 
-Ədalət Sadıqov
+Ədalət Sadıqov- Data analyst

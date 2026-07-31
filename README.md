@@ -115,8 +115,31 @@ The top-20 most-ordered list is dominated almost entirely by fresh produce.
 
 ![Top 20 items added to the cart first](CHARTS/11_top20_first_added.png)
 
+### Statistical deep-dive
+
+Descriptive statistics on `order_hour_of_day` and `days_since_prior_order` add precision to the patterns above:
+
+- **`order_hour_of_day`**: median 13:00, close to the mean (≈13.45) — the hour-of-day distribution is roughly symmetric with a mild afternoon lean, and the 24-bin histogram confirms the same 9 AM–5 PM plateau and ~10 AM peak seen in the day/hour breakdown above.
+- **`days_since_prior_order`**: mean **11.10 days**, median **7.00 days**, variance **84.46**, std. dev. **≈9.19 days**. The gap between mean and median (11.1 vs. 7.0) confirms the right-skew already visible in the reorder-cadence chart — most customers reorder weekly, but a long tail of slower-cycle customers pulls the average upward.
+- **Boxplot check for outliers**: the interquartile box sits between ~4 and ~15 days (median ≈7), and no points fall beyond the whiskers as classic outliers. This is a direct consequence of the 30-day top-coding — an uncapped dataset would very likely show true outliers among customers who churned or shopped elsewhere for a stretch.
+- **Correlation check**: `order_hour_of_day` vs. `order_number` correlation ≈ **−0.03** — essentially no relationship. The hour a customer chooses to shop says nothing about how many times they've ordered before; loyalty and time-of-day preference are independent behaviors in this dataset.
+
+### Reorder rate by department
+
+Merging `order_products` → `products` → `departments` and taking the mean of the `reordered` flag per department surfaces clear category-level loyalty tiers:
+
+| Tier | Departments | Reorder rate |
+|---|---|---|
+| Habitual staples | Dairy eggs, Beverages, Produce, Bakery | 63–67% |
+| Everyday essentials | Deli, Pets, Babies, Bulk, Alcohol, Snacks | 58–60% |
+| Occasional restock | Meat & seafood, Breakfast, Frozen | 54–57% |
+| Discovery-driven | Dry goods & pasta, Canned goods | ~46% |
+| Low repeat-purchase | Household, International, Pantry, Personal care | 32–41% |
+
+**Dairy eggs (67.1%)** tops the ranking, **Personal care (32.0%)** sits at the bottom — a >2x spread that lines up with intuition: perishable, routine grocery categories get rebought constantly, while household/personal-care items are typically bought less frequently or switched between brands more readily.
+
 ### Executive summary dashboard
-- 4 KPI cards (total records processed, total customer orders, unique products, overall reorder rate) plus 4 linked charts — peak shopping windows by day/hour, reorder rate by department, order volume by day of week, and the 10 most popular products — condensed into a single interactive Plotly dashboard at the top of this README.
+All of the above converges into a single top-of-README dashboard: **4.5M+** order-product records processed, **478,952** cleaned orders, **49,694** catalog products, and a **59.1%** overall reorder rate, alongside the peak-shopping heatmap, department reorder-rate ranking, day-of-week order volume, and the top 10 most popular products.
 
 All chart files, plus a one-line takeaway per chart, are indexed in [`CHARTS/README.md`](CHARTS/README.md).
 
@@ -125,7 +148,8 @@ All chart files, plus a one-line takeaway per chart, are indexed in [`CHARTS/REA
 - **Staffing & fulfillment**: order volume peaks 10 AM–4 PM and on weekends — inventory replenishment and picking staff should be scheduled around this window.
 - **Retention targeting**: the wide spread in customer-level reorder proportion (0% to 100%) is a usable segmentation signal — "explorer" customers may respond better to discovery-driven marketing, while "repeaters" are prime candidates for subscribe-and-save offers on their staple items.
 - **Category strategy**: fresh produce (bananas, spinach, avocado, strawberries) drives both volume and loyalty — a natural anchor category for promotions or loyalty programs, while high reorder-rate niche items (probiotic drinks, seltzer) indicate strong habitual purchase categories worth stocking reliably.
-- **Data quality flag for production use**: the 30-day cap on `days_since_prior_order` and the 64-item cap on `add_to_cart_order` are known top-coding artifacts — any downstream model using these fields as continuous variables should account for the ceiling effect rather than treating capped values at face value.
+- **Department-level assortment planning**: reorder rate varies more than 2x across departments (Dairy eggs 67.1% vs. Personal care 32.0%) — habitual-staple departments (dairy, beverages, produce, bakery) justify tighter stock-out tolerances and auto-replenishment nudges, while low-repeat departments (personal care, pantry, international, household) are better suited to discovery/browse-driven merchandising than subscription pushes.
+- **Data quality flag for production use**: the 30-day cap on `days_since_prior_order` and the 64-item cap on `add_to_cart_order` are known top-coding artifacts — any downstream model using these fields as continuous variables should account for the ceiling effect rather than treating capped values at face value. The absence of boxplot outliers in `days_since_prior_order` is a direct symptom of this cap, not evidence of a genuinely outlier-free customer base.
 
 ## Tech Stack
 
